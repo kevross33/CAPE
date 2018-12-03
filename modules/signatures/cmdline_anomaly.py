@@ -289,7 +289,7 @@ class PowershellRenamedCommandLine(Signature):
 
 class CommandLineLongString(Signature):
     name = "commandline_long_string"
-    description = "A script or command line contains a long continuous string indicative of obfuscation"
+    description = "A script or command line contains a long continuous string possibly indicative of obfuscation"
     severity = 3
     categories = ["commands"]
     authors = ["Kevin Ross"]
@@ -312,7 +312,7 @@ class CommandLineLongString(Signature):
             for utility in utilities:
                 if utility in cmdline.lower():
                     for string in cmdline.split():
-                        if len(string) > 100:
+                        if len(string) > 100 and "http://" not in string and "https://" not in string:
                             ret = True
                             self.data.append({"command" : cmdline})
 
