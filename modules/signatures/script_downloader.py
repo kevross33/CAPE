@@ -34,7 +34,7 @@ class ScriptNetworkActvity(Signature):
 
     def on_call(self, call, process):
         pname = process["process_name"].lower()
-        if pname in ["cscript.exe", "jscript.exe", "wscript.exe"]:
+        if pname.lower() in ["cscript.exe", "jscript.exe", "mshta.exe", "wscript.exe"]:
             if call["api"] == "URLDownloadToFileW":
                 buff = self.get_argument(call, "FileName").lower()
                 self.ret = True
@@ -71,20 +71,13 @@ class SuspiciousJSScript(Signature):
     def __init__(self, *args, **kwargs):
         Signature.__init__(self, *args, **kwargs)
         self.ret = False
-        self.suspicious = [
-            "cmd.exe",
-            "cmd ",
-            "powershell",
-            ".shellexecute",
-            "wscript.shell",
-        ]
 
     filter_apinames = set(["JsEval", "COleScript_ParseScriptText"])
 
     def on_call(self, call, process):
         if call["api"] == "JsEval":
             pname = process["process_name"]
-            if pname in ["cscript.exe", "jscript.exe", "wscript.exe"]:
+            if pname.lower() in ["cscript.exe", "jscript.exe", "mshta.exe", "wscript.exe"]:
                 javascript = self.get_argument(call, "JavaScript")
                 for suspicious in self.suspicious:
                     if suspicious in javascript.lower():
@@ -94,7 +87,7 @@ class SuspiciousJSScript(Signature):
 
         if call["api"] == "COleScript_ParseScriptText":
             pname = process["process_name"]
-            if pname in ["cscript.exe", "jscript.exe", "wscript.exe"]:
+            if pname.lower() in ["cscript.exe", "jscript.exe", "wscript.exe"]:
                 javascript = self.get_argument(call, "Script")
                 for suspicious in self.suspicious:
                     if suspicious in javascript.lower():
@@ -124,7 +117,7 @@ class ScriptCreatedProcess(Signature):
 
     def on_call(self, call, process):
         pname = process["process_name"]
-        if pname in ["cscript.exe", "jscript.exe", "wscript.exe"]:
+        if pname.lower() in ["cscript.exe", "jscript.exe", "mshta.exe", "wscript.exe"]:
             cmdline = self.get_argument(call, "CommandLine")
             if cmdline:
                 self.ret = True
